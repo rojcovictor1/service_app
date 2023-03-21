@@ -65,3 +65,10 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f'{self.client} subscribed to {self.service} {self.plan}'
+
+    def save(self, *args, **kwargs):
+        creating = not bool(self.id)
+        result = super().save(*args, **kwargs)
+        if creating:
+            set_price.delay(self.id)
+        return result
